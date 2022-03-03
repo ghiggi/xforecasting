@@ -7,16 +7,15 @@ test*
 .Rhistory
 
 # Folders
-/data/equiangular/
-/data/healpix/
 /tmp/
-/figs/figs/
-/scripts_dev/
+/figs/ 
 /scripts_dev/
 /dask-worker-space/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
+/_pycache__/
+/*/_pycache__/
 *.py[cod]
 *$py.class
 

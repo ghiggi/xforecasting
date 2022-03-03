@@ -18,7 +18,7 @@ For a local installation, follow the below instructions.
    git clone https://github.com/ghiggi/xforecasting.git
    cd x-forecasting
    ```
-
+  
 2. Install manually the following dependencies:
    - Install first pytorch and its extensions on GPU:
       ```sh
@@ -31,10 +31,10 @@ For a local installation, follow the below instructions.
    - Install the other required packages: 
    ```sh
    conda create --name xforecasting-dev python=3.8
-   conda install xarray dask cdo h5py h5netcdf netcdf4 zarr numcodecs rechunker
-   conda install notebook jupyterlab
-   conda install matplotlib-base 
-   conda install numpy pandas numba scipy bottleneck
+   conda install -c conda-forge xarray dask cdo h5py h5netcdf netcdf4 zarr numcodecs rechunker
+   conda install -c conda-forge notebook jupyterlab
+   conda install -c conda-forge matplotlib-base cycler
+   conda install -c conda-forge numpy pandas numba scipy bottleneck tabulate
    ```
    
 2. Alternatively install the dependencies using one of the appropriate below 
