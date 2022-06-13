@@ -5,6 +5,7 @@ Created on Sun Jan  3 19:49:16 2021
 
 @author: ghiggi
 """
+import chunk
 import os
 import shutil
 import time
@@ -763,19 +764,27 @@ def rechunk_forecasts_for_verification(
     default_chunks["leadtime"] = 1
     # Check chunking
     chunks = check_chunks(ds=ds, chunks=chunks, default_chunks=default_chunks)
-    ##------------------------------------------------------------------------.
-    # Rechunk Dataset (on disk)
-    rechunk_Dataset(
-        ds=ds,
-        chunks=chunks,
-        target_store=intermediate_store,
-        temp_store=temp_store,
-        max_mem=max_mem,
-        force=force,
-    )
-    ##------------------------------------------------------------------------.
-    # Load rechunked dataset (contiguous over forecast referece time, chunked over space)
-    ds = xr.open_zarr(intermediate_store, chunks="auto")
+    enough_mem_available = ds.nbytes <= dask.utils.parse_bytes(max_mem)
+
+    if not enough_mem_available:
+        ##------------------------------------------------------------------------.
+        # Rechunk Dataset (on disk)
+        rechunk_Dataset(
+            ds=ds,
+            chunks=chunks,
+            target_store=intermediate_store,
+            temp_store=temp_store,
+            max_mem=max_mem,
+            force=force,
+        )
+        zarr.convenience.consolidate_metadata(intermediate_store)
+
+        ##------------------------------------------------------------------------.
+        # Load rechunked dataset (contiguous over forecast referece time, chunked over space)
+        ds = xr.open_zarr(intermediate_store, chunks="auto")
+    else:
+        ds = ds.compute()
+
     ##------------------------------------------------------------------------.
     # Reshape
     ds_verification = reshape_forecasts_for_verification(ds)
@@ -786,10 +795,23 @@ def rechunk_forecasts_for_verification(
 
     ##------------------------------------------------------------------------.
     # Write to disk
-    ds_verification.to_zarr(target_store)
+    for var in list(ds.data_vars.keys()):
+        if "time" not in chunks[var] and "forecast_reference_time" in chunks[var]:
+            chunks[var]["time"] = chunks[var].pop("forecast_reference_time")
+    
+    write_zarr(
+        target_store, 
+        ds_verification,
+        chunks=chunks,
+        rounding=None,
+        consolidated=True,
+        append=False,
+        show_progress=True,
+    )
     ##------------------------------------------------------------------------.
     # Remove rechunked store
-    shutil.rmtree(intermediate_store)
+    if not enough_mem_available:
+        shutil.rmtree(intermediate_store)
     ##------------------------------------------------------------------------.
     # Load the Dataset for verification
     ds_verification = xr.open_zarr(target_store)
