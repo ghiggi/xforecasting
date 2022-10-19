@@ -320,6 +320,7 @@ def write_zarr(
     compressor="auto",
     default_compressor=None,
     rounding=None,
+    encoding=None,
     consolidated=True,
     append=False,
     append_dim=None,
@@ -379,6 +380,20 @@ def write_zarr(
                     ds[var] = ds[var].round(decimal)
         else:
             raise NotImplementedError("'rounding' should be int, dict or None.")
+    
+    ##------------------------------------------------------------------------.
+    # - Verify encoding dictionary
+    if encoding:
+        if not isinstance(encoding, dict):
+            raise TypeError("Encodings should be a dict")
+        for data_var in encoding.keys():
+            if data_var not in ds.data_vars:
+                raise KeyError("Keys on top-level of the encoding dictionary should be a valid data_var of the dataset")
+            for key in encoding[data_var].keys():
+                if key not in ["dtype", "_FillValue", "scale_factor"]:
+                    raise KeyError("Encoding keys should be among dtype, _FillValue and scale_factor")
+                ds[data_var].encoding[key] = encoding[data_var][key]
+
     ##------------------------------------------------------------------------.
     # - Remove previous encoding filters
     # - https://github.com/pydata/xarray/issues/3476
