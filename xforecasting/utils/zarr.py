@@ -390,8 +390,8 @@ def write_zarr(
             if data_var not in ds.data_vars:
                 raise KeyError("Keys on top-level of the encoding dictionary should be a valid data_var of the dataset")
             for key in encoding[data_var].keys():
-                if key not in ["dtype", "_FillValue", "scale_factor"]:
-                    raise KeyError("Encoding keys should be among dtype, _FillValue and scale_factor")
+                if key not in ["dtype", "_FillValue", "scale_factor", "add_offset"]:
+                    raise KeyError("Encoding keys should be among dtype, add_offset, _FillValue and scale_factor")
                 ds[data_var].encoding[key] = encoding[data_var][key]
 
     ##------------------------------------------------------------------------.
