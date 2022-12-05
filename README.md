@@ -3,7 +3,7 @@
 The code in this repository provides a scalable and flexible framework to develop spatio-temporal forecasting models. 
 It principally builds upon xarray, pytorch and zarr libraries.
 
-ATTENTION: The code is subject to changes in the coming months.
+*ATTENTION: The code is subject to changes in the coming months.*
 
 The folder `tutorials` (will) provide jupyter notebooks describing various features of x-forecasting.
 
