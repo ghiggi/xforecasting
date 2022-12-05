@@ -1,7 +1,7 @@
 # xforecasting - A toolbox for spatio-temporal forecasting with xarray and pytorch.
 
 The code in this repository provides a scalable and flexible framework to develop spatio-temporal forecasting models. 
-It princiapially builds upon xarray, pytorch and zarr libraries.
+It principally builds upon xarray, pytorch and zarr libraries.
 
 ATTENTION: The code is subject to changes in the coming months.
 
@@ -16,7 +16,7 @@ For a local installation, follow the below instructions.
 1. Clone this repository.
    ```sh
    git clone https://github.com/ghiggi/xforecasting.git
-   cd x-forecasting
+   cd xforecasting
    ```
   
 2. Install manually the following dependencies:
@@ -37,15 +37,18 @@ For a local installation, follow the below instructions.
    conda install -c conda-forge numpy pandas numba scipy bottleneck tabulate
    ```
    
-2. Alternatively install the dependencies using one of the appropriate below 
-   environment.yml files:
+2. Alternatively install the dependencies using one of the appropriate below environment.yml files:
    ```sh
-   conda env create -f TODO.yml
+   conda env create -f environment.yml
    ```
 
 ## Tutorials
 
-## Reproducing our results
+* SOON TO BE AVAILABLE 
+
+## Applications
+* Global numerical weather prediction on the sphere: [DeepSphere-Weather](https://github.com/deepsphere/deepsphere-weather)
+* Nowcasting of precipitation: [Now-Project](https://github.com/yasserhaddad/nowproject)
 
 ## Contributors
 
