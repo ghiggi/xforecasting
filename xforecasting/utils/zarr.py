@@ -661,7 +661,6 @@ def get_reading_time(fpath, isel_dict={}, n_repetitions=5):
         ds = xr.open_zarr(fpath)
         ds = ds.isel(isel_dict)
         ds.load()
-        return None
 
     times = []
     for i in range(1, n_repetitions):
@@ -771,6 +770,7 @@ def profile_zarr_io(
 #### Define default zarr compressors ####
 #########################################
 def _get_blosc_compressors(clevels=[0, 1, 3, 5, 9]):
+    """Get blosc compressors."""
     cnames = numcodecs.blosc.list_compressors()
     shuffles = [
         numcodecs.Blosc.BITSHUFFLE,
@@ -788,6 +788,7 @@ def _get_blosc_compressors(clevels=[0, 1, 3, 5, 9]):
 
 
 def _get_lmza_compressors(clevels=[0, 1, 3, 5, 9]):
+    """Get lmza compressors."""
     # - preset: compression level between 0 and 9
     # - dist: distance between bytes to be subtracted (default 1)
     # Cannot specify filters except with FORMAT_RAW
@@ -811,6 +812,7 @@ def _get_lmza_compressors(clevels=[0, 1, 3, 5, 9]):
 
 
 def _get_zip_compressors(clevels=[0, 1, 3, 5, 9]):
+    """Get zip compressor."""
     # - BZ2 do not accept clevel = 0
     compressors = {}
     for clevel in clevels:
@@ -823,6 +825,7 @@ def _get_zip_compressors(clevels=[0, 1, 3, 5, 9]):
 
 
 def _get_zfpy_compressors():
+    """Get zfpy compressor."""
     # TODO define some options
     # - Not yet available for Python 3.8.5
     # - precision: A integer number, specifying the compression precision needed
@@ -832,11 +835,9 @@ def _get_zfpy_compressors():
 
 
 def _getlossless_compressors(clevels=[0, 1, 3, 5, 9]):
+    """Get lossless compressors."""
     compressors = _get_blosc_compressors(clevels=clevels)
     # compressors.update(_get_lmza_compressors(clevels=clevels))
     compressors.update(_get_zip_compressors(clevels=clevels))
     # compressors.update(_get_zfpy_compressors())
     return compressors
-
-
-# -----------------------------------------------------------------------------.

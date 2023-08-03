@@ -281,7 +281,7 @@ def _get_subset_timesteps_idxs(timesteps, subset_timesteps, strict_match=True):
     return subset_idxs
 
 
-def _get_dim_order(data):
+def _get_dim_order(data, feature_last=True):
     # If None, return None
     if data is None:
         return None
@@ -291,25 +291,34 @@ def _get_dim_order(data):
         if "feature" not in dims:
             raise ValueError("The 'feature' dimension is required in a DataArray.")
         # If last dimension is not 'feature', move to last position (it's done in the dataset/dataloader)
-        if dims[-1] != "feature":
-            warnings.warn("The last dimension of a DataArray should be 'feature'.")
-            dims = [dim for dim in dims if dim != "feature"]
-            dims.append("feature")
+        if feature_last:
+            if dims[-1] != "feature":
+                warnings.warn("The last dimension of a DataArray should be 'feature'.")
+                dims = [dim for dim in dims if dim != "feature"]
+                dims.append("feature")
+        else: 
+            if dims[0] != "feature":
+                warnings.warn("The first dimension of a DataArray should be 'feature'.")
+                dims = ['feature'] + [dim for dim in dims if dim != "feature"]
+            
     # If Dataset data.dims does not correspond to the dimension of within DataArrays !!!
     if isinstance(data, xr.Dataset):
         # - Here I assume that all within DataArrays have same dimension order !!!
         # --> xr_have_Dataset_vars_same_dims(data) must be performed before !
         dims = list(data[list(data.data_vars.keys())[0]].dims)
-        dims = dims + ["feature"]
+        if feature_last:
+            dims = dims + ["feature"]
+        else: 
+            dims = ["feature"] + dims 
     dim_order = ["sample"] + dims
     return dim_order
 
 
-def _get_dim_info(data):
+def _get_dim_info(data, feature_last):
     # If None, return None
     if data is None:
         return None
-    dim_order = _get_dim_order(data)
+    dim_order = _get_dim_order(data, feature_last=feature_last)
     dim_info = {k: i for i, k in enumerate(dim_order)}
     return dim_info
 
@@ -341,15 +350,18 @@ def _get_feature_info(data):
     return feature_info
 
 
-def _get_shape_order(data):
+def _get_shape_order(data, feature_last=True):
     # If None, return None
     if data is None:
         return None
     # If DataArray or Dataset, retrieve features
     if isinstance(data, xr.Dataset):
         data = data.to_array("feature")
-    # Ensure 'feature' is the last dimension
-    data = data.transpose(..., "feature")
+    # Ensure 'feature' position
+    if feature_last:
+        data = data.transpose(..., "feature")
+    else: 
+        data = data.transpose("feature", ...)
     # Retrieve shape
     shape_order = list(data.shape)
     shape_order = [None] + shape_order
